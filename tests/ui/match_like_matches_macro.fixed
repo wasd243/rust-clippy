@@ -478,12 +478,25 @@ mod issue17503 {
             Some($name)
         };
     }
+    enum FromExpansion {
+        A(Option<u8>),
+        B(Option<u8>),
+    }
 
     // ok
     fn from_expansion(v: Option<u8>) -> bool {
         match v {
             mk_pat!(a) => true,
             mk_pat!(b) => true,
+            _ => false,
+        }
+    }
+
+    // ok
+    fn from_expansion2(v: FromExpansion) -> bool {
+        match v {
+            FromExpansion::A(mk_pat!(a)) => true,
+            FromExpansion::B(mk_pat!(b)) => true,
             _ => false,
         }
     }

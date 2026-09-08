@@ -145,10 +145,7 @@ pub(super) fn check_match<'tcx>(
 
         for arm in arms_without_last {
             let pat = arm.pat;
-            if pat.span.from_expansion() {
-                return false;
-            }
-            if has_at_binding(pat) {
+            if has_at_binding_or_macro_expansion(pat) {
                 return false;
             }
             if !is_lint_allowed(cx, REDUNDANT_PATTERN_MATCHING, pat.hir_id) && is_some_wild(pat.kind) {
@@ -252,18 +249,18 @@ fn is_some_wild(pat_kind: PatKind<'_>) -> bool {
     }
 }
 
-/// Bails on `@` bindings.
-fn has_at_binding(pat: &Pat<'_>) -> bool {
-    let mut found_at_binding = false;
+/// Bails on `@` bindings or macro expansions.
+fn has_at_binding_or_macro_expansion(pat: &Pat<'_>) -> bool {
+    let mut found = false;
 
     pat.walk_short(|p| {
-        if matches!(p.kind, PatKind::Binding(_, _, _, Some(_))) {
-            found_at_binding = true;
+        if matches!(p.kind, PatKind::Binding(_, _, _, Some(_))) || p.span.from_expansion() {
+            found = true;
             return false;
         }
         true
     });
-    found_at_binding
+    found
 }
 
 /// Replace bindings in a pattern's snippet with `_`, so multiple arms with

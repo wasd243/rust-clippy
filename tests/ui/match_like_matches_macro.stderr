@@ -855,7 +855,7 @@ LL +         matches!(v, [_, ..] | [_, _])
    |
 
 error: match expression looks like `matches!` macro
-  --> tests/ui/match_like_matches_macro.rs:657:9
+  --> tests/ui/match_like_matches_macro.rs:670:9
    |
 LL | /         match v {
 LL | |             (Kind::A(Data { x, .. }), Some(y)) => true,
